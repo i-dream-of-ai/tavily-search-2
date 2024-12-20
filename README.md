@@ -57,8 +57,8 @@ uv pip install mcp-tavily
 Clone this repository and build and install the program with your default Python interpreter (recommended).
 
 ```bash
-git clone https://github.com/modelcontextprotocol/servers.git
-cd servers/mcp-tavily
+git clone https://github.com/RamXX/mcp-tavily.git
+cd mcp-tavily
 uv build
 uv pip install .
 ```
