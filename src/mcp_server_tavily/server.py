@@ -1,6 +1,7 @@
 from typing import Annotated
 from mcp.server import Server
 from mcp.shared.exceptions import McpError
+from mcp.types import ErrorData
 from mcp.server.stdio import stdio_server
 from mcp.types import (
     GetPromptResult,
@@ -317,9 +318,9 @@ async def serve(api_key: str) -> None:
                 response["excluded_domains"] = args.exclude_domains
                 
         except (InvalidAPIKeyError, UsageLimitExceededError) as e:
-            raise McpError(INTERNAL_ERROR, str(e))
+            raise McpError(ErrorData(INTERNAL_ERROR, str(e)))
         except ValueError as e:
-            raise McpError(INVALID_PARAMS, str(e))
+            raise McpError(ErrorData(INVALID_PARAMS, str(e)))
 
         return [TextContent(
             type="text",
@@ -329,7 +330,7 @@ async def serve(api_key: str) -> None:
     @server.get_prompt()
     async def get_prompt(name: str, arguments: dict | None) -> GetPromptResult:
         if not arguments or "query" not in arguments:
-            raise McpError(INVALID_PARAMS, "Query is required")
+            raise McpError(ErrorData(INVALID_PARAMS, "Query is required"))
 
         try:
             # Parse domain filters if provided
@@ -364,7 +365,7 @@ async def serve(api_key: str) -> None:
                     exclude_domains=exclude_domains or [],
                 )
             else:
-                raise McpError(INVALID_PARAMS, f"Unknown prompt: {name}")
+                raise McpError(ErrorData(INVALID_PARAMS, f"Unknown prompt: {name}"))
 
             # Add domain filter information to response for formatting
             if include_domains:
