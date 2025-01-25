@@ -109,7 +109,7 @@ class NewsSearch(SearchBase):
             default=None,
             description="Number of days back to search (default is 3)",
             gt=0,
-            lt=365,
+            le=365,
         ),
     ]
 
