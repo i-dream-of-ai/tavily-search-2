@@ -37,7 +37,7 @@ The server also provides prompt templates for each search type:
 
 ## Prerequisites
 
-- Python 3.13 or later
+- Python 3.11 or later
 - A Tavily API key (obtain from [Tavily's website](https://tavily.com))
 - `uv` Python package manager (recommended)
 
