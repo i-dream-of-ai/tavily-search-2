@@ -19,6 +19,7 @@ from tavily import TavilyClient, InvalidAPIKeyError, UsageLimitExceededError
 from typing import Literal
 
 import json
+import asyncio
 from pydantic import field_validator
 
 class SearchBase(BaseModel):
@@ -119,6 +120,11 @@ async def serve(api_key: str) -> None:
     Args:
         api_key: Tavily API key
     """
+    # Ensure we don't have any lingering tasks
+    for task in asyncio.all_tasks():
+        if task is not asyncio.current_task() and task.get_name().startswith('tavily_'):
+            task.cancel()
+    
     server = Server("mcp-tavily")
     client = TavilyClient(api_key=api_key)
 
@@ -396,11 +402,25 @@ async def serve(api_key: str) -> None:
 
     options = server.create_initialization_options()
     async with stdio_server() as (read_stream, write_stream):
-        await server.run(read_stream, write_stream, options, raise_exceptions=True)
+        try:
+            await server.run(read_stream, write_stream, options, raise_exceptions=True)
+        finally:
+            # Clean up any lingering tasks
+            for task in asyncio.all_tasks():
+                if task is not asyncio.current_task() and task.get_name().startswith('tavily_'):
+                    task.cancel()
+                    try:
+                        await asyncio.wait_for(task, timeout=0.1)
+                    except (asyncio.CancelledError, asyncio.TimeoutError):
+                        pass
 
 if __name__ == "__main__":
     import asyncio
     import os
+    from dotenv import load_dotenv
+    
+    # Load environment variables from .env file
+    load_dotenv()
     
     api_key = os.getenv("TAVILY_API_KEY")
     if not api_key:

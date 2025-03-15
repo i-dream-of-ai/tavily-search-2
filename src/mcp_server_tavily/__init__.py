@@ -1,4 +1,5 @@
 from .server import serve
+from dotenv import load_dotenv
 
 
 def main():
@@ -6,6 +7,9 @@ def main():
     import argparse
     import asyncio
     import os
+    
+    # Load environment variables from .env file
+    load_dotenv()
     
     parser = argparse.ArgumentParser(
         description="give a model the ability to perform AI-powered web searches using Tavily"
