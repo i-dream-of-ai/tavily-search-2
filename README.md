@@ -1,5 +1,7 @@
 # Tavily MCP Server
 
+[<img alt="Install in VS Code" src="https://img.shields.io/badge/VS_Code-VS_Code?style=flat-square&label=Install%20Server&color=0098FF">](https://vscode.dev/redirect?url=vscode%3Amcp%2Finstall%3F%257B%2522name%2522%253A%2522tavily%2522%252C%2522command%2522%253A%2522python%2522%252C%2522args%2522%253A%255B%2522-m%2522%252C%2522mcp_server_tavily%2522%255D%252C%2522env%2522%253A%257B%2522TAVILY_API_KEY%2522%253A%2522%2524%257Binput%253Atavily_api_key%257D%2522%257D%252C%2522inputs%2522%253A%255B%257B%2522id%2522%253A%2522tavily_api_key%2522%252C%2522description%2522%253A%2522Tavily%2520API%2520Key%2522%252C%2522password%2522%253Atrue%257D%255D%257D) [<img alt="Install in VS Code Insiders" src="https://img.shields.io/badge/VS_Code_Insiders-VS_Code_Insiders?style=flat-square&label=Install%20Server&color=24bfa5">](https://insiders.vscode.dev/redirect?url=vscode-insiders%3Amcp%2Finstall%3F%257B%2522name%2522%253A%2522tavily%2522%252C%2522command%2522%253A%2522python%2522%252C%2522args%2522%253A%255B%2522-m%2522%252C%2522mcp_server_tavily%2522%255D%252C%2522env%2522%253A%257B%2522TAVILY_API_KEY%2522%253A%2522%2524%257Binput%253Atavily_api_key%257D%2522%257D%252C%2522inputs%2522%253A%255B%257B%2522id%2522%253A%2522tavily_api_key%2522%252C%2522description%2522%253A%2522Tavily%2520API%2520Key%2522%252C%2522password%2522%253Atrue%257D%255D%257D)
+
 A Model Context Protocol server that provides AI-powered web search capabilities using Tavily's search API. This server enables LLMs to perform sophisticated web searches, get direct answers to questions, and search recent news articles with AI-extracted relevant content.
 
 ## Features
@@ -7,25 +9,27 @@ A Model Context Protocol server that provides AI-powered web search capabilities
 ### Available Tools
 
 - `tavily_web_search` - Performs comprehensive web searches with AI-powered content extraction.
-    - `query` (string, required): Search query
-    - `max_results` (integer, optional): Maximum number of results to return (default: 5, max: 20)
-    - `search_depth` (string, optional): Either "basic" or "advanced" search depth (default: "basic")
-    - `include_domains` (list or string, optional): List of domains to specifically include in results
-    - `exclude_domains` (list or string, optional): List of domains to exclude from results
+
+  - `query` (string, required): Search query
+  - `max_results` (integer, optional): Maximum number of results to return (default: 5, max: 20)
+  - `search_depth` (string, optional): Either "basic" or "advanced" search depth (default: "basic")
+  - `include_domains` (list or string, optional): List of domains to specifically include in results
+  - `exclude_domains` (list or string, optional): List of domains to exclude from results
 
 - `tavily_answer_search` - Performs web searches and generates direct answers with supporting evidence.
-    - `query` (string, required): Search query
-    - `max_results` (integer, optional): Maximum number of results to return (default: 5, max: 20)
-    - `search_depth` (string, optional): Either "basic" or "advanced" search depth (default: "advanced")
-    - `include_domains` (list or string, optional): List of domains to specifically include in results
-    - `exclude_domains` (list or string, optional): List of domains to exclude from results
+
+  - `query` (string, required): Search query
+  - `max_results` (integer, optional): Maximum number of results to return (default: 5, max: 20)
+  - `search_depth` (string, optional): Either "basic" or "advanced" search depth (default: "advanced")
+  - `include_domains` (list or string, optional): List of domains to specifically include in results
+  - `exclude_domains` (list or string, optional): List of domains to exclude from results
 
 - `tavily_news_search` - Searches recent news articles with publication dates.
-    - `query` (string, required): Search query
-    - `max_results` (integer, optional): Maximum number of results to return (default: 5, max: 20)
-    - `days` (integer, optional): Number of days back to search (default: 3)
-    - `include_domains` (list or string, optional): List of domains to specifically include in results
-    - `exclude_domains` (list or string, optional): List of domains to exclude from results
+  - `query` (string, required): Search query
+  - `max_results` (integer, optional): Maximum number of results to return (default: 5, max: 20)
+  - `days` (integer, optional): Number of days back to search (default: 3)
+  - `include_domains` (list or string, optional): List of domains to specifically include in results
+  - `exclude_domains` (list or string, optional): List of domains to exclude from results
 
 ### Prompts
 
@@ -54,6 +58,7 @@ uv add mcp-tavily
 ```
 
 You should see output similar to:
+
 ```
 Resolved packages: mcp-tavily, mcp, pydantic, python-dotenv, tavily-python [...]
 Successfully installed mcp-tavily-0.1.4 mcp-1.0.0 [...]
@@ -87,11 +92,13 @@ During installation, you should see the package being built and installed with i
 The server requires a Tavily API key, which can be provided in three ways:
 
 1. Through a `.env` file in your project directory:
+
    ```
    TAVILY_API_KEY=your_api_key_here
    ```
 
 2. As an environment variable:
+
    ```bash
    export TAVILY_API_KEY=your_api_key_here
    ```
@@ -119,24 +126,73 @@ Add to your Claude settings:
 
 If you encounter issues, you may need to specify the full path to your Python interpreter. Run `which python` to find the exact path.
 
+### Configure for VS Code
+
+You can install the Tavily MCP server in VS Code using the install buttons at the top of this README.
+
+For manual installation:
+
+1. Open VS Code Settings (JSON) by pressing `Ctrl+Shift+P` (Windows/Linux) or `Cmd+Shift+P` (Mac) and searching for "Preferences: Open User Settings (JSON)"
+
+2. Add the following configuration to your settings.json:
+
+```json
+{
+  "mcp.servers": {
+    "tavily": {
+      "command": "python",
+      "args": ["-m", "mcp_server_tavily"],
+      "env": {
+        "TAVILY_API_KEY": "${input:tavily_api_key}"
+      },
+      "inputs": [
+        {
+          "id": "tavily_api_key",
+          "description": "Tavily API Key",
+          "password": true
+        }
+      ]
+    }
+  }
+}
+```
+
+Alternatively, you can install via the command line:
+
+VS Code Stable:
+
+```
+code --add-mcp '{"name":"tavily","command":"python","args":["-m","mcp_server_tavily"],"env":{"TAVILY_API_KEY":"${input:tavily_api_key}"},"inputs":[{"id":"tavily_api_key","description":"Tavily API Key","password":true}]}'
+```
+
+VS Code Insiders:
+
+```
+code-insiders --add-mcp '{"name":"tavily","command":"python","args":["-m","mcp_server_tavily"],"env":{"TAVILY_API_KEY":"${input:tavily_api_key}"},"inputs":[{"id":"tavily_api_key","description":"Tavily API Key","password":true}]}'
+```
+
 ## Usage Examples
 
 For a regular web search:
+
 ```
 Tell me about Anthropic's newly released MCP protocol
 ```
 
 To generate a report with domain filtering:
+
 ```
 Tell me about redwood trees. Please use MLA format in markdown syntax and include the URLs in the citations. Exclude Wikipedia sources.
 ```
 
 To use answer search mode for direct answers:
+
 ```
 I want a concrete answer backed by current web sources: What is the average lifespan of redwood trees?
 ```
 
 For news search:
+
 ```
 Give me the top 10 AI-related news in the last 5 days
 ```
@@ -146,6 +202,7 @@ Give me the top 10 AI-related news in the last 5 days
 The project includes a comprehensive test suite. To run the tests:
 
 1. Install test dependencies:
+
    ```bash
    source .venv/bin/activate  # If using a virtual environment
    uv sync --dev  # Or: pip install -r requirements-dev.txt
@@ -157,6 +214,7 @@ The project includes a comprehensive test suite. To run the tests:
    ```
 
 You should see output similar to:
+
 ```
 ============================= test session starts ==============================
 collected 27 items
