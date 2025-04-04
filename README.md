@@ -7,25 +7,27 @@ A Model Context Protocol server that provides AI-powered web search capabilities
 ### Available Tools
 
 - `tavily_web_search` - Performs comprehensive web searches with AI-powered content extraction.
-    - `query` (string, required): Search query
-    - `max_results` (integer, optional): Maximum number of results to return (default: 5, max: 20)
-    - `search_depth` (string, optional): Either "basic" or "advanced" search depth (default: "basic")
-    - `include_domains` (list or string, optional): List of domains to specifically include in results
-    - `exclude_domains` (list or string, optional): List of domains to exclude from results
+
+  - `query` (string, required): Search query
+  - `max_results` (integer, optional): Maximum number of results to return (default: 5, max: 20)
+  - `search_depth` (string, optional): Either "basic" or "advanced" search depth (default: "basic")
+  - `include_domains` (list or string, optional): List of domains to specifically include in results
+  - `exclude_domains` (list or string, optional): List of domains to exclude from results
 
 - `tavily_answer_search` - Performs web searches and generates direct answers with supporting evidence.
-    - `query` (string, required): Search query
-    - `max_results` (integer, optional): Maximum number of results to return (default: 5, max: 20)
-    - `search_depth` (string, optional): Either "basic" or "advanced" search depth (default: "advanced")
-    - `include_domains` (list or string, optional): List of domains to specifically include in results
-    - `exclude_domains` (list or string, optional): List of domains to exclude from results
+
+  - `query` (string, required): Search query
+  - `max_results` (integer, optional): Maximum number of results to return (default: 5, max: 20)
+  - `search_depth` (string, optional): Either "basic" or "advanced" search depth (default: "advanced")
+  - `include_domains` (list or string, optional): List of domains to specifically include in results
+  - `exclude_domains` (list or string, optional): List of domains to exclude from results
 
 - `tavily_news_search` - Searches recent news articles with publication dates.
-    - `query` (string, required): Search query
-    - `max_results` (integer, optional): Maximum number of results to return (default: 5, max: 20)
-    - `days` (integer, optional): Number of days back to search (default: 3)
-    - `include_domains` (list or string, optional): List of domains to specifically include in results
-    - `exclude_domains` (list or string, optional): List of domains to exclude from results
+  - `query` (string, required): Search query
+  - `max_results` (integer, optional): Maximum number of results to return (default: 5, max: 20)
+  - `days` (integer, optional): Number of days back to search (default: 3)
+  - `include_domains` (list or string, optional): List of domains to specifically include in results
+  - `exclude_domains` (list or string, optional): List of domains to exclude from results
 
 ### Prompts
 
@@ -54,6 +56,7 @@ uv add mcp-tavily
 ```
 
 You should see output similar to:
+
 ```
 Resolved packages: mcp-tavily, mcp, pydantic, python-dotenv, tavily-python [...]
 Successfully installed mcp-tavily-0.1.4 mcp-1.0.0 [...]
@@ -80,6 +83,42 @@ uv sync --dev  # Or: pip install -r requirements-dev.txt
 
 During installation, you should see the package being built and installed with its dependencies.
 
+### Usage with VS Code
+
+For quick installation, use one of the one-click install buttons below:
+
+[![Install with UV in VS Code](https://img.shields.io/badge/VS_Code-UV-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white)](https://insiders.vscode.dev/redirect/mcp/install?name=tavily&inputs=%5B%7B%22type%22%3A%22promptString%22%2C%22id%22%3A%22apiKey%22%2C%22description%22%3A%22Tavily%20API%20Key%22%2C%22password%22%3Atrue%7D%5D&config=%7B%22command%22%3A%22uvx%22%2C%22args%22%3A%5B%22mcp-tavily%22%5D%2C%22env%22%3A%7B%22TAVILY_API_KEY%22%3A%22%24%7Binput%3AapiKey%7D%22%7D%7D) [![Install with UV in VS Code Insiders](https://img.shields.io/badge/VS_Code_Insiders-UV-24bfa5?style=flat-square&logo=visualstudiocode&logoColor=white)](https://insiders.vscode.dev/redirect/mcp/install?name=tavily&inputs=%5B%7B%22type%22%3A%22promptString%22%2C%22id%22%3A%22apiKey%22%2C%22description%22%3A%22Tavily%20API%20Key%22%2C%22password%22%3Atrue%7D%5D&config=%7B%22command%22%3A%22uvx%22%2C%22args%22%3A%5B%22mcp-tavily%22%5D%2C%22env%22%3A%7B%22TAVILY_API_KEY%22%3A%22%24%7Binput%3AapiKey%7D%22%7D%7D&quality=insiders)
+
+For manual installation, add the following JSON block to your User Settings (JSON) file in VS Code. You can do this by pressing `Ctrl + Shift + P` and typing `Preferences: Open User Settings (JSON)`.
+
+Optionally, you can add it to a file called `.vscode/mcp.json` in your workspace. This will allow you to share the configuration with others.
+
+> Note that the `mcp` key is not needed in the `.vscode/mcp.json` file.
+
+```json
+{
+  "mcp": {
+    "inputs": [
+      {
+        "type": "promptString",
+        "id": "apiKey",
+        "description": "Tavily API Key",
+        "password": true
+      }
+    ],
+    "servers": {
+      "tavily": {
+        "command": "uvx",
+        "args": ["mcp-tavily"],
+        "env": {
+          "TAVILY_API_KEY": "${input:apiKey}"
+        }
+      }
+    }
+  }
+}
+```
+
 ## Configuration
 
 ### API Key Setup
@@ -87,11 +126,13 @@ During installation, you should see the package being built and installed with i
 The server requires a Tavily API key, which can be provided in three ways:
 
 1. Through a `.env` file in your project directory:
+
    ```
    TAVILY_API_KEY=your_api_key_here
    ```
 
 2. As an environment variable:
+
    ```bash
    export TAVILY_API_KEY=your_api_key_here
    ```
@@ -122,21 +163,25 @@ If you encounter issues, you may need to specify the full path to your Python in
 ## Usage Examples
 
 For a regular web search:
+
 ```
 Tell me about Anthropic's newly released MCP protocol
 ```
 
 To generate a report with domain filtering:
+
 ```
 Tell me about redwood trees. Please use MLA format in markdown syntax and include the URLs in the citations. Exclude Wikipedia sources.
 ```
 
 To use answer search mode for direct answers:
+
 ```
 I want a concrete answer backed by current web sources: What is the average lifespan of redwood trees?
 ```
 
 For news search:
+
 ```
 Give me the top 10 AI-related news in the last 5 days
 ```
@@ -146,6 +191,7 @@ Give me the top 10 AI-related news in the last 5 days
 The project includes a comprehensive test suite. To run the tests:
 
 1. Install test dependencies:
+
    ```bash
    source .venv/bin/activate  # If using a virtual environment
    uv sync --dev  # Or: pip install -r requirements-dev.txt
@@ -157,6 +203,7 @@ The project includes a comprehensive test suite. To run the tests:
    ```
 
 You should see output similar to:
+
 ```
 ============================= test session starts ==============================
 collected 27 items
