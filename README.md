@@ -1,7 +1,5 @@
 # Tavily MCP Server
 
-[<img alt="Install in VS Code" src="https://img.shields.io/badge/VS_Code-VS_Code?style=flat-square&label=Install%20Server&color=0098FF">](https://vscode.dev/redirect?url=vscode%3Amcp%2Finstall%3F%257B%2522name%2522%253A%2522tavily%2522%252C%2522command%2522%253A%2522python%2522%252C%2522args%2522%253A%255B%2522-m%2522%252C%2522mcp_server_tavily%2522%255D%252C%2522env%2522%253A%257B%2522TAVILY_API_KEY%2522%253A%2522%2524%257Binput%253Atavily_api_key%257D%2522%257D%252C%2522inputs%2522%253A%255B%257B%2522id%2522%253A%2522tavily_api_key%2522%252C%2522description%2522%253A%2522Tavily%2520API%2520Key%2522%252C%2522password%2522%253Atrue%257D%255D%257D) [<img alt="Install in VS Code Insiders" src="https://img.shields.io/badge/VS_Code_Insiders-VS_Code_Insiders?style=flat-square&label=Install%20Server&color=24bfa5">](https://insiders.vscode.dev/redirect?url=vscode-insiders%3Amcp%2Finstall%3F%257B%2522name%2522%253A%2522tavily%2522%252C%2522command%2522%253A%2522python%2522%252C%2522args%2522%253A%255B%2522-m%2522%252C%2522mcp_server_tavily%2522%255D%252C%2522env%2522%253A%257B%2522TAVILY_API_KEY%2522%253A%2522%2524%257Binput%253Atavily_api_key%257D%2522%257D%252C%2522inputs%2522%253A%255B%257B%2522id%2522%253A%2522tavily_api_key%2522%252C%2522description%2522%253A%2522Tavily%2520API%2520Key%2522%252C%2522password%2522%253Atrue%257D%255D%257D)
-
 A Model Context Protocol server that provides AI-powered web search capabilities using Tavily's search API. This server enables LLMs to perform sophisticated web searches, get direct answers to questions, and search recent news articles with AI-extracted relevant content.
 
 ## Features
@@ -85,6 +83,42 @@ uv sync --dev  # Or: pip install -r requirements-dev.txt
 
 During installation, you should see the package being built and installed with its dependencies.
 
+### Usage with VS Code
+
+For quick installation, use one of the one-click install buttons below:
+
+[![Install with UV in VS Code](https://img.shields.io/badge/VS_Code-UV-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white)](https://insiders.vscode.dev/redirect/mcp/install?name=tavily&inputs=%5B%7B%22type%22%3A%22promptString%22%2C%22id%22%3A%22apiKey%22%2C%22description%22%3A%22Tavily%20API%20Key%22%2C%22password%22%3Atrue%7D%5D&config=%7B%22command%22%3A%22uvx%22%2C%22args%22%3A%5B%22mcp-tavily%22%5D%2C%22env%22%3A%7B%22TAVILY_API_KEY%22%3A%22%24%7Binput%3AapiKey%7D%22%7D%7D) [![Install with UV in VS Code Insiders](https://img.shields.io/badge/VS_Code_Insiders-UV-24bfa5?style=flat-square&logo=visualstudiocode&logoColor=white)](https://insiders.vscode.dev/redirect/mcp/install?name=tavily&inputs=%5B%7B%22type%22%3A%22promptString%22%2C%22id%22%3A%22apiKey%22%2C%22description%22%3A%22Tavily%20API%20Key%22%2C%22password%22%3Atrue%7D%5D&config=%7B%22command%22%3A%22uvx%22%2C%22args%22%3A%5B%22mcp-tavily%22%5D%2C%22env%22%3A%7B%22TAVILY_API_KEY%22%3A%22%24%7Binput%3AapiKey%7D%22%7D%7D&quality=insiders)
+
+For manual installation, add the following JSON block to your User Settings (JSON) file in VS Code. You can do this by pressing `Ctrl + Shift + P` and typing `Preferences: Open User Settings (JSON)`.
+
+Optionally, you can add it to a file called `.vscode/mcp.json` in your workspace. This will allow you to share the configuration with others.
+
+> Note that the `mcp` key is not needed in the `.vscode/mcp.json` file.
+
+```json
+{
+  "mcp": {
+    "inputs": [
+      {
+        "type": "promptString",
+        "id": "apiKey",
+        "description": "Tavily API Key",
+        "password": true
+      }
+    ],
+    "servers": {
+      "tavily": {
+        "command": "uvx",
+        "args": ["mcp-tavily"],
+        "env": {
+          "TAVILY_API_KEY": "${input:apiKey}"
+        }
+      }
+    }
+  }
+}
+```
+
 ## Configuration
 
 ### API Key Setup
@@ -125,51 +159,6 @@ Add to your Claude settings:
 ```
 
 If you encounter issues, you may need to specify the full path to your Python interpreter. Run `which python` to find the exact path.
-
-### Configure for VS Code
-
-You can install the Tavily MCP server in VS Code using the install buttons at the top of this README.
-
-For manual installation:
-
-1. Open VS Code Settings (JSON) by pressing `Ctrl+Shift+P` (Windows/Linux) or `Cmd+Shift+P` (Mac) and searching for "Preferences: Open User Settings (JSON)"
-
-2. Add the following configuration to your settings.json:
-
-```json
-{
-  "mcp.servers": {
-    "tavily": {
-      "command": "python",
-      "args": ["-m", "mcp_server_tavily"],
-      "env": {
-        "TAVILY_API_KEY": "${input:tavily_api_key}"
-      },
-      "inputs": [
-        {
-          "id": "tavily_api_key",
-          "description": "Tavily API Key",
-          "password": true
-        }
-      ]
-    }
-  }
-}
-```
-
-Alternatively, you can install via the command line:
-
-VS Code Stable:
-
-```
-code --add-mcp '{"name":"tavily","command":"python","args":["-m","mcp_server_tavily"],"env":{"TAVILY_API_KEY":"${input:tavily_api_key}"},"inputs":[{"id":"tavily_api_key","description":"Tavily API Key","password":true}]}'
-```
-
-VS Code Insiders:
-
-```
-code-insiders --add-mcp '{"name":"tavily","command":"python","args":["-m","mcp_server_tavily"],"env":{"TAVILY_API_KEY":"${input:tavily_api_key}"},"inputs":[{"id":"tavily_api_key","description":"Tavily API Key","password":true}]}'
-```
 
 ## Usage Examples
 
