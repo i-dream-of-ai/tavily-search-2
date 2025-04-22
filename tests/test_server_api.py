@@ -4,6 +4,7 @@ import asyncio
 import inspect
 from mcp.types import Tool, TextContent, GetPromptResult, PromptMessage
 from mcp.shared.exceptions import McpError
+from mcp.types import INVALID_PARAMS, INTERNAL_ERROR
 from tavily import InvalidAPIKeyError, UsageLimitExceededError
 from mcp.server import Server
 
@@ -83,7 +84,7 @@ class TestServerListPrompts:
         await server_module.serve("fake_api_key")
         
         # Get the function that was registered with @server.list_prompts()
-        list_prompts_handler = mock_server.list_prompts.call_args[0][0]
+        list_prompts_handler = mock_server.handler_registry['list_prompts']
         
         # Call the function
         prompts = await list_prompts_handler()
@@ -114,7 +115,7 @@ class TestServerCallTool:
         await server_module.serve("fake_api_key")
         
         # Get the function that was registered with @server.call_tool()
-        call_tool_handler = mock_server.call_tool.call_args[0][0]
+        call_tool_handler = mock_server.handler_registry['call_tool']
         
         # Call the function with web search parameters
         result = await call_tool_handler(
@@ -153,7 +154,7 @@ class TestServerCallTool:
         await server_module.serve("fake_api_key")
         
         # Get the function that was registered with @server.call_tool()
-        call_tool_handler = mock_server.call_tool.call_args[0][0]
+        call_tool_handler = mock_server.handler_registry['call_tool']
         
         # Call the function with answer search parameters
         result = await call_tool_handler(
@@ -188,7 +189,7 @@ class TestServerCallTool:
         await server_module.serve("fake_api_key")
         
         # Get the function that was registered with @server.call_tool()
-        call_tool_handler = mock_server.call_tool.call_args[0][0]
+        call_tool_handler = mock_server.handler_registry['call_tool']
         
         # Call the function with news search parameters
         result = await call_tool_handler(
@@ -223,7 +224,7 @@ class TestServerCallTool:
         await server_module.serve("fake_api_key")
         
         # Get the function that was registered with @server.call_tool()
-        call_tool_handler = mock_server.call_tool.call_args[0][0]
+        call_tool_handler = mock_server.handler_registry['call_tool']
         
         # Call the function with news search parameters, without days
         result = await call_tool_handler(
@@ -249,53 +250,49 @@ class TestServerCallTool:
         await server_module.serve("fake_api_key")
         
         # Get the function that was registered with @server.call_tool()
-        call_tool_handler = mock_server.call_tool.call_args[0][0]
+        call_tool_handler = mock_server.handler_registry['call_tool']
         
-        # Call with an invalid tool name
-        with pytest.raises(ValueError, match="Unknown tool"):
+        # Call with an invalid tool name should raise McpError with INVALID_PARAMS
+        with pytest.raises(McpError) as exc_info:
             await call_tool_handler(name="invalid_tool", arguments={"query": "test"})
+        assert exc_info.value.error.code == INVALID_PARAMS
+        assert "Unknown tool" in str(exc_info.value)
     
     async def test_call_tool_api_key_error(self, mock_tavily_client, mock_server):
         """Test that call_tool handles API key errors correctly."""
-        # Set up the mock client to raise an error
-        # Using a generic Exception with the InvalidAPIKeyError name to avoid init signature issues
-        mock_error = Exception("Invalid API key")
-        mock_error.__class__.__name__ = "InvalidAPIKeyError"
-        mock_tavily_client.search.side_effect = mock_error
+        # Set up the mock client to raise an API key error
+        # Mock API key error (raised by client)
+        mock_tavily_client.search.side_effect = InvalidAPIKeyError
         
         # Create a server instance to get the decorated function
         await server_module.serve("fake_api_key")
         
         # Get the function that was registered with @server.call_tool()
-        call_tool_handler = mock_server.call_tool.call_args[0][0]
+        call_tool_handler = mock_server.handler_registry['call_tool']
         
         # Call the function and expect an McpError
         with pytest.raises(McpError) as exc_info:
             await call_tool_handler(name="tavily_web_search", arguments={"query": "test"})
-        
-        # Verify the error details
-        assert "Invalid API key" in str(exc_info.value)
+        # API key errors map to INTERNAL_ERROR
+        assert exc_info.value.error.code == INTERNAL_ERROR
     
     async def test_call_tool_usage_limit_error(self, mock_tavily_client, mock_server):
         """Test that call_tool handles usage limit errors correctly."""
-        # Set up the mock client to raise an error
-        # Using a generic Exception with the UsageLimitExceededError name to avoid init signature issues
-        mock_error = Exception("Usage limit exceeded")
-        mock_error.__class__.__name__ = "UsageLimitExceededError"
-        mock_tavily_client.search.side_effect = mock_error
+        # Set up the mock client to raise a usage limit error
+        # Mock usage limit exceeded error
+        mock_tavily_client.search.side_effect = UsageLimitExceededError("Usage limit exceeded")
         
         # Create a server instance to get the decorated function
         await server_module.serve("fake_api_key")
         
         # Get the function that was registered with @server.call_tool()
-        call_tool_handler = mock_server.call_tool.call_args[0][0]
+        call_tool_handler = mock_server.handler_registry['call_tool']
         
         # Call the function and expect an McpError
         with pytest.raises(McpError) as exc_info:
             await call_tool_handler(name="tavily_web_search", arguments={"query": "test"})
-        
-        # Verify the error details
-        assert "Usage limit exceeded" in str(exc_info.value)
+        # Usage limit errors map to INTERNAL_ERROR
+        assert exc_info.value.error.code == INTERNAL_ERROR
         
     async def test_call_tool_validation_error(self, mock_server):
         """Test that call_tool properly validates input parameters."""
@@ -303,7 +300,7 @@ class TestServerCallTool:
         await server_module.serve("fake_api_key")
         
         # Get the function that was registered with @server.call_tool()
-        call_tool_handler = mock_server.call_tool.call_args[0][0]
+        call_tool_handler = mock_server.handler_registry['call_tool']
         
         # Test with invalid max_results
         with pytest.raises(McpError) as exc_info:
@@ -338,7 +335,7 @@ class TestServerCallTool:
         await server_module.serve("fake_api_key")
         
         # Get the function that was registered with @server.call_tool()
-        call_tool_handler = mock_server.call_tool.call_args[0][0]
+        call_tool_handler = mock_server.handler_registry['call_tool']
         
         # Call the function with JSON formatted domain lists
         await call_tool_handler(
@@ -371,7 +368,7 @@ class TestServerGetPrompt:
         await server_module.serve("fake_api_key")
         
         # Get the function that was registered with @server.get_prompt()
-        get_prompt_handler = mock_server.get_prompt.call_args[0][0]
+        get_prompt_handler = mock_server.handler_registry['get_prompt']
         
         # Call the function with web search parameters
         result = await get_prompt_handler(
@@ -407,7 +404,7 @@ class TestServerGetPrompt:
         await server_module.serve("fake_api_key")
         
         # Get the function that was registered with @server.get_prompt()
-        get_prompt_handler = mock_server.get_prompt.call_args[0][0]
+        get_prompt_handler = mock_server.handler_registry['get_prompt']
         
         # Call the function with answer search parameters
         result = await get_prompt_handler(
@@ -442,7 +439,7 @@ class TestServerGetPrompt:
         await server_module.serve("fake_api_key")
         
         # Get the function that was registered with @server.get_prompt()
-        get_prompt_handler = mock_server.get_prompt.call_args[0][0]
+        get_prompt_handler = mock_server.handler_registry['get_prompt']
         
         # Call the function with news search parameters including days
         result = await get_prompt_handler(
@@ -477,7 +474,7 @@ class TestServerGetPrompt:
         await server_module.serve("fake_api_key")
         
         # Get the function that was registered with @server.get_prompt()
-        get_prompt_handler = mock_server.get_prompt.call_args[0][0]
+        get_prompt_handler = mock_server.handler_registry['get_prompt']
         
         # Call the function without days parameter
         result = await get_prompt_handler(
@@ -502,7 +499,7 @@ class TestServerGetPrompt:
         await server_module.serve("fake_api_key")
         
         # Get the function that was registered with @server.get_prompt()
-        get_prompt_handler = mock_server.get_prompt.call_args[0][0]
+        get_prompt_handler = mock_server.handler_registry['get_prompt']
         
         # Call with missing query
         with pytest.raises(McpError, match="Query is required"):
@@ -518,59 +515,55 @@ class TestServerGetPrompt:
         await server_module.serve("fake_api_key")
         
         # Get the function that was registered with @server.get_prompt()
-        get_prompt_handler = mock_server.get_prompt.call_args[0][0]
+        get_prompt_handler = mock_server.handler_registry['get_prompt']
         
-        # Call with an invalid prompt name
-        with pytest.raises(McpError, match="Unknown prompt"):
+        # Call with an invalid prompt name should raise McpError INVALID_PARAMS
+        with pytest.raises(McpError) as exc_info:
             await get_prompt_handler(name="invalid_prompt", arguments={"query": "test"})
+        assert exc_info.value.error.code == INVALID_PARAMS
+        assert "Unknown prompt" in str(exc_info.value)
     
     async def test_get_prompt_api_error(self, mock_tavily_client, mock_server):
         """Test that get_prompt handles API errors gracefully."""
-        # Set up the mock client to raise an error
-        # Using a generic Exception with the InvalidAPIKeyError name to avoid init signature issues
-        mock_error = Exception("Invalid API key")
-        mock_error.__class__.__name__ = "InvalidAPIKeyError"
-        mock_tavily_client.search.side_effect = mock_error
+        # Set up the mock client to raise an API key error
+        mock_tavily_client.search.side_effect = InvalidAPIKeyError
         
         # Create a server instance to get the decorated function
         await server_module.serve("fake_api_key")
         
         # Get the function that was registered with @server.get_prompt()
-        get_prompt_handler = mock_server.get_prompt.call_args[0][0]
+        get_prompt_handler = mock_server.handler_registry['get_prompt']
         
         # Call the function - should return an error message instead of raising
         result = await get_prompt_handler(
             name="tavily_web_search", 
             arguments={"query": "test query"}
         )
-        
         # Verify the result contains the error message
-        assert "Failed to search" in result.description
+        assert "failed to search" in result.description.lower()
         assert len(result.messages) == 1
-        assert "Invalid API key" in result.messages[0].content.text
+        # Default Tavily error message contains 'api key is invalid'
+        assert "api key is invalid" in result.messages[0].content.text.lower()
         
     async def test_get_prompt_usage_limit_error(self, mock_tavily_client, mock_server):
         """Test that get_prompt handles usage limit errors gracefully."""
         # Set up the mock client to raise a usage limit error
-        mock_error = Exception("Usage limit exceeded")
-        mock_error.__class__.__name__ = "UsageLimitExceededError"
-        mock_tavily_client.search.side_effect = mock_error
+        mock_tavily_client.search.side_effect = UsageLimitExceededError("Usage limit exceeded")
         
         # Create a server instance to get the decorated function
         await server_module.serve("fake_api_key")
         
         # Get the function that was registered with @server.get_prompt()
-        get_prompt_handler = mock_server.get_prompt.call_args[0][0]
+        get_prompt_handler = mock_server.handler_registry['get_prompt']
         
         # Call the function - should return an error message instead of raising
         result = await get_prompt_handler(
             name="tavily_answer_search", 
             arguments={"query": "test query"}
         )
-        
         # Verify the result contains the error message
-        assert "Failed to search" in result.description
-        assert "Usage limit exceeded" in result.messages[0].content.text
+        assert "failed to search" in result.description.lower()
+        assert "usage limit exceeded" in result.messages[0].content.text.lower()
         
     async def test_get_prompt_json_domain_input(self, mock_tavily_client, mock_server, web_search_response):
         """Test that get_prompt correctly handles JSON domain input."""
@@ -581,7 +574,7 @@ class TestServerGetPrompt:
         await server_module.serve("fake_api_key")
         
         # Get the function that was registered with @server.get_prompt()
-        get_prompt_handler = mock_server.get_prompt.call_args[0][0]
+        get_prompt_handler = mock_server.handler_registry['get_prompt']
         
         # Call the function with JSON formatted domain lists
         result = await get_prompt_handler(
@@ -609,7 +602,7 @@ class TestServerGetPrompt:
         await server_module.serve("fake_api_key")
         
         # Get the function that was registered with @server.get_prompt()
-        get_prompt_handler = mock_server.get_prompt.call_args[0][0]
+        get_prompt_handler = mock_server.handler_registry['get_prompt']
         
         # Call the function with days as string
         await get_prompt_handler(

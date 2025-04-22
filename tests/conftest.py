@@ -69,10 +69,8 @@ def mock_server():
         # Ensure these methods are called during serve()
         server_instance.create_initialization_options = MagicMock(return_value={})
         
-        # Use our SafeAsyncMock instead of AsyncMock
-        run_future = asyncio.Future()
-        run_future.set_result(None)
-        server_instance.run = SafeAsyncMock(return_value=run_future)
+        # Use our SafeAsyncMock for the server.run method
+        server_instance.run = SafeAsyncMock(return_value=None)
         
         mock_server_class.return_value = server_instance
         yield server_instance
@@ -99,18 +97,12 @@ def mock_stdio_server():
 
 
 @pytest.fixture
-async def server_handlers(mock_server):
+def server_handlers(mock_server):
     """Return the registered handlers after calling serve."""
+    import asyncio
     from mcp_server_tavily.server import serve
-    await serve("fake_api_key")
-    # Ensure there are no pending tasks
-    for task in asyncio.all_tasks():
-        if task is not asyncio.current_task():
-            task.cancel()
-            try:
-                await task
-            except asyncio.CancelledError:
-                pass
+    # Run serve to register all handlers
+    asyncio.run(serve("fake_api_key"))
     return mock_server.handler_registry
 
 

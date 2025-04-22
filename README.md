@@ -205,27 +205,77 @@ The project includes a comprehensive test suite. To run the tests:
 You should see output similar to:
 
 ```
-============================= test session starts ==============================
-collected 27 items
+======================================================= test session starts ========================================================
+platform darwin -- Python 3.13.3, pytest-8.3.5, pluggy-1.5.0
+rootdir: /Users/ramirosalas/workspace/mcp-tavily
+configfile: pyproject.toml
+plugins: cov-6.0.0, asyncio-0.25.3, anyio-4.8.0, mock-3.14.0
+asyncio: mode=Mode.STRICT, asyncio_default_fixture_loop_scope=function
+collected 50 items                                                                                                                 
 
-tests/test_models.py ................. [ 62%]
-tests/test_utils.py ..... [ 81%]
-tests/test_integration.py ..... [100%]
+tests/test_docker.py ..                                                                                                      [  4%]
+tests/test_integration.py .....                                                                                              [ 14%]
+tests/test_models.py .................                                                                                       [ 48%]
+tests/test_server_api.py .....................                                                                               [ 90%]
+tests/test_utils.py .....                                                                                                    [100%]
 
----------- coverage: platform darwin, python 3.13.2-final-0 ----------
+---------- coverage: platform darwin, python 3.13.3-final-0 ----------
 Name                                Stmts   Miss  Cover
 -------------------------------------------------------
 src/mcp_server_tavily/__init__.py      16      2    88%
 src/mcp_server_tavily/__main__.py       2      2     0%
-src/mcp_server_tavily/server.py       137     80    42%
+src/mcp_server_tavily/server.py       149     16    89%
 -------------------------------------------------------
-TOTAL                                 155     84    46%
-
-
-============================== 27 passed in 0.40s ==============================
+TOTAL                                 167     20    88%
 ```
 
 The test suite includes tests for data models, utility functions, integration testing, error handling, and parameter validation. It focuses on verifying that all API capabilities work correctly, including handling of domain filters and various input formats.
+
+## Docker
+
+Build the Docker image:
+
+```bash
+make docker-build
+```
+
+Alternatively, build directly with Docker:
+
+```bash
+docker build -t mcp_tavily .
+```
+
+Run a detached Docker container (default name `mcp_tavily_container`, port 8000 → 8000):
+
+```bash
+make docker-run
+```
+
+Or manually:
+
+```bash
+docker run -d --name mcp_tavily_container \
+  -e TAVILY_API_KEY=your_api_key_here \
+  -p 8000:8000 mcp_tavily
+```
+
+Stop and remove the container:
+
+```bash
+make docker-stop
+```
+
+Follow container logs:
+
+```bash
+make docker-logs
+```
+
+You can override defaults by setting environment variables:
+  - DOCKER_IMAGE: image name (default `mcp_tavily`)
+  - DOCKER_CONTAINER: container name (default `mcp_tavily_container`)
+  - HOST_PORT: host port to bind (default `8000`)
+  - CONTAINER_PORT: container port (default `8000`)
 
 ## Debugging
 

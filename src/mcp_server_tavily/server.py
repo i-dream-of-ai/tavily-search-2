@@ -324,9 +324,9 @@ async def serve(api_key: str) -> None:
                 response["excluded_domains"] = args.exclude_domains
                 
         except (InvalidAPIKeyError, UsageLimitExceededError) as e:
-            raise McpError(ErrorData(INTERNAL_ERROR, str(e)))
+            raise McpError(ErrorData(code=INTERNAL_ERROR, message=str(e)))
         except ValueError as e:
-            raise McpError(ErrorData(INVALID_PARAMS, str(e)))
+            raise McpError(ErrorData(code=INVALID_PARAMS, message=str(e)))
 
         return [TextContent(
             type="text",
@@ -336,7 +336,7 @@ async def serve(api_key: str) -> None:
     @server.get_prompt()
     async def get_prompt(name: str, arguments: dict | None) -> GetPromptResult:
         if not arguments or "query" not in arguments:
-            raise McpError(ErrorData(INVALID_PARAMS, "Query is required"))
+            raise McpError(ErrorData(code=INVALID_PARAMS, message="Query is required"))
 
         try:
             # Parse domain filters if provided
@@ -371,7 +371,7 @@ async def serve(api_key: str) -> None:
                     exclude_domains=exclude_domains or [],
                 )
             else:
-                raise McpError(ErrorData(INVALID_PARAMS, f"Unknown prompt: {name}"))
+                raise McpError(ErrorData(code=INVALID_PARAMS, message=f"Unknown prompt: {name}"))
 
             # Add domain filter information to response for formatting
             if include_domains:

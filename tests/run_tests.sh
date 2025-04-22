@@ -26,6 +26,6 @@ fi
 
 # Run all tests with coverage and suppress warnings
 echo "Running all tests with coverage..."
-python -W ignore -m pytest tests/test_models.py tests/test_utils.py tests/test_integration.py --cov=src/mcp_server_tavily --cov-report=term
+python -W ignore -m pytest tests --cov=src/mcp_server_tavily --cov-report=term
 
 echo "Tests complete!"
