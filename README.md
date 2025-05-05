@@ -1,5 +1,3 @@
-[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/ramxx-mcp-tavily-badge.png)](https://mseep.ai/app/ramxx-mcp-tavily)
-
 # Tavily MCP Server
 
 A Model Context Protocol server that provides AI-powered web search capabilities using Tavily's search API. This server enables LLMs to perform sophisticated web searches, get direct answers to questions, and search recent news articles with AI-extracted relevant content.
