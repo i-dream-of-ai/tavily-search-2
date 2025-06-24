@@ -14,7 +14,8 @@
       "Bash(mkdir:*)",
       "Bash(make test-deps:*)",
       "Bash(./scripts/test-compatibility.sh:*)",
-      "Bash(make:*)"
+      "Bash(make:*)",
+      "Bash(uv pip install:*)"
     ],
     "deny": []
   }

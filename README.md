@@ -292,12 +292,25 @@ make release-all
 
 ### Release Workflow
 
+**Recommended approach for releases with latest dependencies:**
+
+1. **Complete release preparation**: `make release-all`
+2. **Upload without downgrades**: `make upload-latest`
+
+**Alternative step-by-step approach:**
+
 1. **Test with latest dependencies**: `make test-compatibility`
 2. **Build for release**: `make release-build`
-3. **Complete release**: `make release-all`
-4. **Upload to PyPI**: `make upload`
+3. **Upload without rebuilding**: `make upload-latest`
 
-The release commands ensure your package is built and tested with the most recent compatible dependency versions, preventing the downgrades that can occur with `make all`.
+**One-command release and publish:**
+```bash
+make release-publish
+```
+
+**Important**: Use `make upload-latest` instead of `make upload` to prevent dependency downgrades during the upload process. The `upload-latest` command uses existing distribution files without reinstalling dependencies.
+
+The release commands ensure your package is built and tested with the most recent compatible dependency versions, preventing the downgrades that can occur with traditional build chains.
 
 ## Docker
 

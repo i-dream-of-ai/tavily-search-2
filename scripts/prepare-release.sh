@@ -61,7 +61,7 @@ if make release-all; then
     echo -e "${BLUE}Next steps:${NC}"
     echo "1. Review the built package in the 'dist/' directory"
     echo "2. Test the package: pip install dist/mcp_tavily-$NEW_VERSION-py3-none-any.whl"
-    echo "3. If everything looks good, upload with: make upload"
+    echo "3. If everything looks good, upload with: make upload-latest"
     echo "4. Commit and tag the release:"
     echo "   git add ."
     echo "   git commit -m \"Release v$NEW_VERSION\""
