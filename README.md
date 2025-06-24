@@ -188,7 +188,9 @@ Give me the top 10 AI-related news in the last 5 days
 
 ## Testing
 
-The project includes a comprehensive test suite. To run the tests:
+The project includes a comprehensive test suite with automated dependency compatibility testing.
+
+### Running Tests
 
 1. Install test dependencies:
 
@@ -197,10 +199,50 @@ The project includes a comprehensive test suite. To run the tests:
    uv sync --dev  # Or: pip install -r requirements-dev.txt
    ```
 
-2. Run the tests:
+2. Run the standard test suite:
    ```bash
    ./tests/run_tests.sh
+   # Or using Make
+   make test
    ```
+
+### Dependency Compatibility Testing
+
+To ensure the project works with the latest dependency versions, use these commands:
+
+```bash
+# Test with latest dependencies using Make
+make test-deps
+
+# Full compatibility test with verbose output
+make test-compatibility
+
+# Or use the standalone script
+./scripts/test-compatibility.sh
+```
+
+These commands will:
+- Update all dependencies to their latest versions
+- Run the full test suite with coverage
+- Report any compatibility issues
+- Show version changes for transparency
+
+### Automated Testing
+
+The project includes automated dependency compatibility testing through GitHub Actions:
+
+- **Weekly Testing**: Runs every Monday at 8 AM UTC
+- **Multi-Python Support**: Tests against Python 3.11, 3.12, and 3.13
+- **Issue Creation**: Automatically creates GitHub issues when tests fail
+- **Manual Trigger**: Can be triggered manually from the GitHub Actions tab
+
+### Understanding Test Results
+
+**When tests pass**: Your project is compatible with the latest dependency versions. You can safely update your requirements files.
+
+**When tests fail**: Review the test output to identify breaking changes, update your code to handle API changes, update tests if needed, or consider pinning problematic dependency versions.
+
+### Test Output Example
 
 You should see output similar to:
 
@@ -230,6 +272,32 @@ TOTAL                                 167     20    88%
 ```
 
 The test suite includes tests for data models, utility functions, integration testing, error handling, and parameter validation. It focuses on verifying that all API capabilities work correctly, including handling of domain filters and various input formats.
+
+## Release Management
+
+The project includes tools for building and releasing with the latest dependency versions:
+
+### Building with Latest Dependencies
+
+```bash
+# Build package with latest dependency versions
+make build-latest
+
+# Complete release workflow: test, build, and check with latest deps
+make release-all
+
+# Prepare a release with version management
+./scripts/prepare-release.sh [new_version]
+```
+
+### Release Workflow
+
+1. **Test with latest dependencies**: `make test-compatibility`
+2. **Build for release**: `make release-build`
+3. **Complete release**: `make release-all`
+4. **Upload to PyPI**: `make upload`
+
+The release commands ensure your package is built and tested with the most recent compatible dependency versions, preventing the downgrades that can occur with `make all`.
 
 ## Docker
 

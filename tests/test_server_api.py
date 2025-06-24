@@ -262,7 +262,7 @@ class TestServerCallTool:
         """Test that call_tool handles API key errors correctly."""
         # Set up the mock client to raise an API key error
         # Mock API key error (raised by client)
-        mock_tavily_client.search.side_effect = InvalidAPIKeyError
+        mock_tavily_client.search.side_effect = InvalidAPIKeyError("Invalid API key")
         
         # Create a server instance to get the decorated function
         await server_module.serve("fake_api_key")
@@ -526,7 +526,7 @@ class TestServerGetPrompt:
     async def test_get_prompt_api_error(self, mock_tavily_client, mock_server):
         """Test that get_prompt handles API errors gracefully."""
         # Set up the mock client to raise an API key error
-        mock_tavily_client.search.side_effect = InvalidAPIKeyError
+        mock_tavily_client.search.side_effect = InvalidAPIKeyError("Invalid API key")
         
         # Create a server instance to get the decorated function
         await server_module.serve("fake_api_key")
@@ -542,8 +542,8 @@ class TestServerGetPrompt:
         # Verify the result contains the error message
         assert "failed to search" in result.description.lower()
         assert len(result.messages) == 1
-        # Default Tavily error message contains 'api key is invalid'
-        assert "api key is invalid" in result.messages[0].content.text.lower()
+        # Error message from the mock
+        assert "invalid api key" in result.messages[0].content.text.lower()
         
     async def test_get_prompt_usage_limit_error(self, mock_tavily_client, mock_server):
         """Test that get_prompt handles usage limit errors gracefully."""
