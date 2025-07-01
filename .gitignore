@@ -185,10 +185,4 @@ local_cache/
 # Ruff
 .ruff_cache
 
-# Dapr
-.dapr
-
-# aider
-.aider*
-
-Makefile.claude/
+.claude/
