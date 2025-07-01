@@ -191,4 +191,4 @@ local_cache/
 # aider
 .aider*
 
-Makefile
+Makefile.claude/
